@@ -41,8 +41,12 @@ jobs:
       - name: Run tests
         run: mvn test --batch-mode
 
+  notify:
     # Notify Slack if the build fails
-    if: failure() # Only run this step if the build fails
+    needs: build
+    runs-on: ubuntu-latest
+    if: failure() # Only run this job if the build fails
+
     steps:
       - name: Notify Slack on Failure
         uses: rtCamp/action-slack-notify@v2
