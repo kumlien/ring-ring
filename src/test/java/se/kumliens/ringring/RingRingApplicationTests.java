@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Import;
 
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest
-@Disabled("måste lägga in env-vars")
+//@Disabled("måste lägga in env-vars")
 class RingRingApplicationTests {
 
 	@Test
