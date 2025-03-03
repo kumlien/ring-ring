@@ -1,25 +1,35 @@
 package se.kumliens.ringring.security;
 
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
+import org.springframework.security.web.SecurityFilterChain;
 
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig extends VaadinWebSecurity {
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        // Allow all authenticated users to access the application
-        super.configure(http);
-        http.oauth2Login(c -> c.loginPage("/login").permitAll());
+    @Bean
+    public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
+        // Configure security for REST API endpoints
+        http.securityMatcher("/api/**") // Apply this configuration only to /api/** endpoints
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/**").authenticated() // Require authentication for /api/** endpoints
+                )
+                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt); // Enable JWT validation for APIs
+
+        return http.build();
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
-        // Customize your WebSecurity configuration.
-        super.configure(web);
+    protected void configure(HttpSecurity http) throws Exception {
+        // Apply Vaadin's default security configuration for all other requests
+        super.configure(http);
+
+        // Configure OAuth2 login for Vaadin pages
+        http.oauth2Login(oauth2 -> oauth2.loginPage("/login").permitAll());
     }
 }
