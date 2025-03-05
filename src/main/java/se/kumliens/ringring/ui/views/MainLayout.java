@@ -13,21 +13,30 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.sidenav.SideNav;
+import com.vaadin.flow.router.AfterNavigationListener;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterListener;
+import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import lombok.extern.slf4j.Slf4j;
+import se.kumliens.ringring.security.LoginHandler;
 import se.kumliens.ringring.security.UserSession;
 import se.kumliens.ringring.ui.components.NavigationLink;
 import se.kumliens.ringring.ui.views.dashboard.DashboardView;
 
+@Slf4j
 @CssImport("./styles/main-layout.css") // Import the CSS file
 public class MainLayout extends AppLayout {
 
-    public MainLayout(UserSession userSession) {
+    private final LoginHandler loginHandler;
+    private final UserSession userSession;
 
-       var header = header(userSession);
-
+    public MainLayout(UserSession userSession, LoginHandler loginHandler) {
+        this.loginHandler = loginHandler;
+        this.userSession = userSession;
+        var header = header(userSession);
         addToNavbar(header);
         addToDrawer(getSideNav());
-
     }
 
     private Component createAvatar(UserSession userSession) {
@@ -70,5 +79,10 @@ public class MainLayout extends AppLayout {
         header.addClassName("header");
 
         return header;
+    }
+
+    @Override
+    protected void afterNavigation() {
+        loginHandler.handleLogin(userSession);
     }
 }

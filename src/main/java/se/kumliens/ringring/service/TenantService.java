@@ -16,7 +16,7 @@ import java.util.stream.StreamSupport;
 public class TenantService {
     private final TenantRepo tenantRepository;
 
-    public Tenant createTenant(Tenant tenant) {
+    public Tenant upsert(Tenant tenant) {
         return tenantRepository.save(tenant);
     }
 

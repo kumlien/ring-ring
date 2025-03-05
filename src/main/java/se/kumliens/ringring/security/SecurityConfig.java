@@ -3,9 +3,9 @@ package se.kumliens.ringring.security;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
 @EnableWebSecurity
@@ -19,7 +19,7 @@ public class SecurityConfig extends VaadinWebSecurity {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/**").authenticated() // Require authentication for /api/** endpoints
                 )
-                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt); // Enable JWT validation for APIs
+                .oauth2ResourceServer(conf -> conf.jwt(Customizer.withDefaults())); // Enable JWT validation for APIs
 
         return http.build();
     }

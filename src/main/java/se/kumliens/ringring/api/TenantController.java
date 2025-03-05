@@ -19,7 +19,7 @@ public class TenantController {
 
     @PostMapping
     public ResponseEntity<Tenant> createTenant(@RequestBody Tenant tenant) {
-        var createdTenant = tenantService.createTenant(tenant);
+        var createdTenant = tenantService.upsert(tenant);
         // Build the full URI for the Location header
         var location = ServletUriComponentsBuilder
                 .fromCurrentRequest() // Get the current request URI (e.g., /api/tenants)
