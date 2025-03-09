@@ -13,27 +13,35 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.sidenav.SideNav;
-import com.vaadin.flow.router.AfterNavigationListener;
 import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterListener;
-import com.vaadin.flow.spring.annotation.SpringComponent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import lombok.extern.slf4j.Slf4j;
-import se.kumliens.ringring.security.LoginHandler;
 import se.kumliens.ringring.security.UserSession;
 import se.kumliens.ringring.ui.components.NavigationLink;
 import se.kumliens.ringring.ui.views.dashboard.DashboardView;
 
 @Slf4j
 @CssImport("./styles/main-layout.css") // Import the CSS file
-public class MainLayout extends AppLayout {
+public class MainLayout extends AppLayout implements BeforeEnterObserver {
 
-    private final LoginHandler loginHandler;
     private final UserSession userSession;
 
-    public MainLayout(UserSession userSession, LoginHandler loginHandler) {
-        this.loginHandler = loginHandler;
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        // Check if the user has completed registration
+        if(userSession.domainIsBlocked) {
+            log.info("Darn, domain for {} is blocked", userSession.user.email());
+        } else if (userSession.tenant == null) {
+            event.forwardTo("register-tenant");
+        } else if(!userSession.isLoggedIn()) {
+            event.forwardTo("register-user");
+        }
+    }
+
+    public MainLayout(UserSession userSession) {
         this.userSession = userSession;
+
         var header = header(userSession);
         addToNavbar(header);
         addToDrawer(getSideNav());
@@ -79,10 +87,5 @@ public class MainLayout extends AppLayout {
         header.addClassName("header");
 
         return header;
-    }
-
-    @Override
-    protected void afterNavigation() {
-        loginHandler.handleLogin(userSession);
     }
 }

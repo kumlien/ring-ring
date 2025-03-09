@@ -4,8 +4,7 @@ import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.*;
 import jakarta.annotation.security.PermitAll;
 import se.kumliens.ringring.security.UserSession;
 import se.kumliens.ringring.ui.views.MainLayout;
@@ -20,11 +19,11 @@ public class DashboardView extends Div {
         addClassName("dashboard-view"); // Add a CSS class to the root container
 
         // Title
-        H1 title = new H1("Welcome " + userSession.getUser().firstName() + " to the Ring Ring app!");
+        H1 title = new H1("Välkommen " + userSession.getUser().firstName() + " till Ring-Ring!");
         title.addClassName("dashboard-title");
 
         // Description
-        Paragraph description = new Paragraph("This is your central hub for managing the application.");
+        Paragraph description = new Paragraph("Här finns galet mycket central o viktig info för dig!");
         description.addClassName("dashboard-description");
 
         // Add components to the view

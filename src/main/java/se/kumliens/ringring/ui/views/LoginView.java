@@ -24,7 +24,7 @@ public class LoginView extends Div {
         addClassName("login-view");
 
         // Title
-        H1 title = new H1("Login to Ring Ring");
+        H1 title = new H1("Logga in to Ring Ring");
         title.addClassName("login-title");
 
         // Login Button
