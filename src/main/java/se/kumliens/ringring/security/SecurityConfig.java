@@ -9,8 +9,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
-@EnableWebSecurity
-@Configuration
+//@EnableWebSecurity
+//@Configuration
 @RequiredArgsConstructor
 public class SecurityConfig extends VaadinWebSecurity {
 
