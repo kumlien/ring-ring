@@ -16,7 +16,7 @@ public class SecurityConfig extends VaadinWebSecurity {
 
     private final CustomAuthSuccessHandler authSuccessHandler;
 
-    @Bean
+    //@Bean
     public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
         // Configure security for REST API endpoints
         http.securityMatcher("/api/**") // Apply this configuration only to /api/** endpoints
