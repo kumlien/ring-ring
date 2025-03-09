@@ -9,14 +9,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
-//@EnableWebSecurity
-//@Configuration
+@EnableWebSecurity
+@Configuration
 @RequiredArgsConstructor
 public class SecurityConfig extends VaadinWebSecurity {
 
     private final CustomAuthSuccessHandler authSuccessHandler;
 
-    //@Bean
+    @Bean
     public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
         // Configure security for REST API endpoints
         http.securityMatcher("/api/**") // Apply this configuration only to /api/** endpoints

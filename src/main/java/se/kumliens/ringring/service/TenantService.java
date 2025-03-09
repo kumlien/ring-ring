@@ -14,16 +14,14 @@ import java.util.stream.StreamSupport;
 @RequiredArgsConstructor
 @Slf4j
 public class TenantService {
-    private  /*final*/ TenantRepo tenantRepository;
+    private final TenantRepo tenantRepository;
 
     public Tenant upsert(Tenant tenant) {
-        //return tenantRepository.save(tenant);
-        return null;
+        return tenantRepository.save(tenant);
     }
 
     public Optional<Tenant> getTenantById(String id) {
-        //return tenantRepository.findById(id);
-        return null;
+        return tenantRepository.findById(id);
     }
 
     public Optional<Tenant> getTenantByDomain(String domain) {
@@ -31,13 +29,12 @@ public class TenantService {
     }
 
     public void deleteTenant(String id) {
-        //tenantRepository.deleteById(id);
+        tenantRepository.deleteById(id);
     }
 
     public List<Tenant> getAllTenants() {
-        //var iter = tenantRepository.findAll();
-        //return StreamSupport.stream(iter.spliterator(), false)
-         //       .toList();
-        return null;
+        var iter = tenantRepository.findAll();
+        return StreamSupport.stream(iter.spliterator(), false)
+                .toList();
     }
 }
