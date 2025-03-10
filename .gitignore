@@ -43,3 +43,4 @@ build/
 
 
 /src/main/bundles/dev.bundle
+.DS_Store
