@@ -4,12 +4,13 @@ import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.router.*;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
 import se.kumliens.ringring.security.UserSession;
 import se.kumliens.ringring.ui.views.MainLayout;
 
-@PageTitle("Dashboard")
+@PageTitle("Dashboard | RingRing")
 @Route(value = "", layout = MainLayout.class)
 @CssImport("./styles/dashboard-view.css") // Import the CSS file for styling
 @PermitAll

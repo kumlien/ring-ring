@@ -11,7 +11,7 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@PageTitle("Login")
+@PageTitle("Login | RingRing")
 @Route("login")
 @AnonymousAllowed
 @CssImport("./styles/login-view.css") // Import the CSS file
