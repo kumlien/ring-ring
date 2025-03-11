@@ -1,20 +1,24 @@
 package se.kumliens.ringring.ui.views.registration;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import se.kumliens.ringring.security.UserSession;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RegistrationWizard extends VerticalLayout {
 
-    private final List<Div> steps = new ArrayList<>();
+    private final List<Component> steps = new ArrayList<>();
     private int currentStepIndex = 0;
 
-    public RegistrationWizard() {
+    public RegistrationWizard(UserSession userSession) {
         // Initialize steps
-        steps.add(createTenantInfoStep());
+        steps.add(createTenantInfoStep(userSession));
         steps.add(createUserInfoStep());
         steps.add(createConfirmationStep());
 
@@ -22,16 +26,21 @@ public class RegistrationWizard extends VerticalLayout {
         showStep(currentStepIndex);
     }
 
-    private Div createTenantInfoStep() {
-        Div stepContent = new Div();
-        stepContent.setText("Step 1: Enter Tenant Information");
+    private Component createTenantInfoStep(UserSession userSession) {
+        var stepContent = new FormLayout();
+        var name = new TextField("Organisationens namn");
+        var domain = new TextField("Organisationens domän");
+        domain.setValue(userSession.getUser().domain());
+        domain.setReadOnly(true);
+
+        //stepContent.setText("Step 1: Enter Tenant Information");
 
         // Add form fields for tenant info
         // Example: TextField tenantName = new TextField("Tenant Name");
 
         // Add navigation buttons
         Button nextButton = new Button("Next", event -> navigateToStep(1));
-        stepContent.add(nextButton);
+        stepContent.add(name, domain, nextButton);
 
         return stepContent;
     }

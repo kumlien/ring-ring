@@ -27,23 +27,10 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
 
     private final UserSession userSession;
 
-    @Override
-    public void beforeEnter(BeforeEnterEvent event) {
-        // Check if the user has completed registration
-        if(userSession.domainIsBlocked) {
-            log.info("Darn, domain for {} is blocked", userSession.user.email());
-        } else if (userSession.tenant == null) {
-            event.forwardTo("register-tenant");
-        } else if(!userSession.isLoggedIn()) {
-            event.forwardTo("register-user");
-        }
-    }
-
     public MainLayout(UserSession userSession) {
         this.userSession = userSession;
 
-        var header = header(userSession);
-        addToNavbar(header);
+        addToNavbar(header(userSession));
         addToDrawer(getSideNav());
     }
 
@@ -87,5 +74,19 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
         header.addClassName("header");
 
         return header;
+    }
+
+    //Needed in the register flow to make sure the user can't reach a MainLayout
+    //by changing the url.
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        // Check if the user has completed registration
+        if(userSession.domainIsBlocked) {
+            log.info("Darn, domain for {} is blocked", userSession.user.email());
+        } else if (userSession.tenant == null) {
+            event.forwardTo("register-tenant");
+        } else if(!userSession.isLoggedIn()) {
+            event.forwardTo("register-user");
+        }
     }
 }

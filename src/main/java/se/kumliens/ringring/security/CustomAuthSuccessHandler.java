@@ -36,6 +36,7 @@ public class CustomAuthSuccessHandler implements AuthenticationSuccessHandler {
         if (isBlockedDomain(domain)) {
             //response.sendRedirect("/blocked-domain");
             //return;
+            log.info("Domain is blocked, re-route later...");
         }
 
         Optional<Tenant> tenant = tenantService.getTenantByDomain(domain);
