@@ -4,8 +4,11 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.theme.lumo.LumoUtility;
 import se.kumliens.ringring.security.UserSession;
 
 import java.util.ArrayList;
@@ -18,7 +21,9 @@ public class RegistrationWizard extends VerticalLayout {
 
     public RegistrationWizard(UserSession userSession) {
         // Initialize steps
-        steps.add(createTenantInfoStep(userSession));
+        if(userSession.tenant == null) {
+            steps.add(createTenantInfoStep(userSession));
+        }
         steps.add(createUserInfoStep());
         steps.add(createConfirmationStep());
 
@@ -27,22 +32,27 @@ public class RegistrationWizard extends VerticalLayout {
     }
 
     private Component createTenantInfoStep(UserSession userSession) {
-        var stepContent = new FormLayout();
+        var orgName = userSession.getUser().domain().substring(0, userSession.getUser().domain().indexOf("."));
+        var header = new H1("Registrera " + orgName);
+        var text = new Span("Du är den första från " + orgName + " som hittat hit, dags för registrering!");
+        text.addClassName(LumoUtility.FontSize.LARGE);
+
+        var form = getOrganisationRegistrationForm(userSession);
+        return new VerticalLayout(header, text, form);
+    }
+
+    private FormLayout getOrganisationRegistrationForm(UserSession userSession) {
+        var form = new FormLayout();
         var name = new TextField("Organisationens namn");
-        var domain = new TextField("Organisationens domän");
+        name.setValue(userSession.getUser().domain().substring(0, userSession.getUser().domain().indexOf(".")));
+        var domain = new TextField("Organisationens domän (en ändringsbart)");
         domain.setValue(userSession.getUser().domain());
         domain.setReadOnly(true);
 
-        //stepContent.setText("Step 1: Enter Tenant Information");
-
-        // Add form fields for tenant info
-        // Example: TextField tenantName = new TextField("Tenant Name");
-
         // Add navigation buttons
-        Button nextButton = new Button("Next", event -> navigateToStep(1));
-        stepContent.add(name, domain, nextButton);
-
-        return stepContent;
+        Button nextButton = new Button("Nästa", event -> navigateToStep(1));
+        form.add(name, domain, nextButton);
+        return form;
     }
 
     private Div createUserInfoStep() {

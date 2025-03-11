@@ -24,11 +24,11 @@ public class LoginView extends Div {
         addClassName("login-view");
 
         // Title
-        H1 title = new H1("Logga in to Ring Ring");
+        H1 title = new H1("Logga in till Ring Ring");
         title.addClassName("login-title");
 
         // Login Button
-        Button loginButton = new Button("Login with Google", e -> {
+        Button loginButton = new Button("Logga in med Google", e -> {
             // Redirect to Google login
             UI.getCurrent().getPage().setLocation(OAUTH_URL);
         });
