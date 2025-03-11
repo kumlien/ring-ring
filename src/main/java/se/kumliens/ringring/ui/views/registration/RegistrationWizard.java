@@ -2,13 +2,15 @@ package se.kumliens.ringring.ui.views.registration;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.theme.lumo.LumoUtility;
 import se.kumliens.ringring.security.UserSession;
 
 import java.util.ArrayList;
@@ -33,25 +35,37 @@ public class RegistrationWizard extends VerticalLayout {
 
     private Component createTenantInfoStep(UserSession userSession) {
         var orgName = userSession.getUser().domain().substring(0, userSession.getUser().domain().indexOf("."));
-        var header = new H1("Registrera " + orgName);
-        var text = new Span("Du är den första från " + orgName + " som hittat hit, dags för registrering!");
-        text.addClassName(LumoUtility.FontSize.LARGE);
+        var header = new H1("Registrering av  '" + orgName +"'");
+        var text = new Span("Hej " + userSession.getUser().firstName()  +
+                ". Du är den första från " + orgName + " som hittat hit. " +
+                "Börja med att ange lite info om " + orgName + ".");
 
         var form = getOrganisationRegistrationForm(userSession);
-        return new VerticalLayout(header, text, form);
+        var layout = new VerticalLayout(header, text, form);
+
+        return layout;
     }
 
     private FormLayout getOrganisationRegistrationForm(UserSession userSession) {
         var form = new FormLayout();
+
         var name = new TextField("Organisationens namn");
         name.setValue(userSession.getUser().domain().substring(0, userSession.getUser().domain().indexOf(".")));
-        var domain = new TextField("Organisationens domän (en ändringsbart)");
+
+        var domain = new TextField("Organisationens domän (ej ändringsbart)");
         domain.setValue(userSession.getUser().domain());
         domain.setReadOnly(true);
 
+        var elks_id = new TextField("46-Elks client id");
+        var elks_secret = new PasswordField("46-Elks client secret");
+        elks_secret.setTooltipText("Alla hemlisar sparas i Azure Key Cloak");
+
         // Add navigation buttons
-        Button nextButton = new Button("Nästa", event -> navigateToStep(1));
-        form.add(name, domain, nextButton);
+        var nextButton = new Button("Nästa", event -> navigateToStep(1));
+        nextButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        var cancelButton = new Button("Avbryt", event -> userSession.logout());
+
+        form.add(name, domain, elks_id, elks_secret, new HorizontalLayout(nextButton, cancelButton));
         return form;
     }
 
