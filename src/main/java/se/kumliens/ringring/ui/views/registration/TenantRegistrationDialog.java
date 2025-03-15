@@ -6,6 +6,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import se.kumliens.ringring.model.SubscriptionPlan;
 import se.kumliens.ringring.model.Tenant;
 import se.kumliens.ringring.model.User;
 import se.kumliens.ringring.security.UserSession;
@@ -38,12 +39,12 @@ public class TenantRegistrationDialog extends Dialog {
             }
 
             // Save the tenant to the database
-            Tenant tenant = new Tenant(
-                    UUID.randomUUID().toString(),
+            Tenant tenant = Tenant.create(
                     domain,
                     tenantNameField.getValue(),
-                    "FREE",
-                    LocalDateTime.now(),
+                    null,
+                    null,
+                    SubscriptionPlan.FREE,
                     new ArrayList<>(), // Empty users list
                     new ArrayList<>(), // Empty offices list
                     new ArrayList<>()  // Empty virtual numbers list

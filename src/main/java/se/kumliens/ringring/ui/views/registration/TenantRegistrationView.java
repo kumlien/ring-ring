@@ -1,5 +1,6 @@
 package se.kumliens.ringring.ui.views.registration;
 
+import com.azure.security.keyvault.secrets.SecretClient;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -13,7 +14,7 @@ import se.kumliens.ringring.security.UserSession;
 @PermitAll
 public class TenantRegistrationView extends VerticalLayout {
 
-    public TenantRegistrationView(UserSession userSession) {
-        add(new RegistrationWizard(userSession));
+    public TenantRegistrationView(UserSession userSession, SecretClient secretClient) {
+        add(new RegistrationWizard(userSession, secretClient));
     }
 }

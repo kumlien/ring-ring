@@ -1,113 +1,107 @@
 package se.kumliens.ringring.ui.views.registration;
 
-import com.vaadin.flow.component.Component;
+import com.azure.security.keyvault.secrets.SecretClient;
+import com.vaadin.flow.component.accordion.Accordion;
+import com.vaadin.flow.component.accordion.AccordionPanel;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
+import lombok.extern.slf4j.Slf4j;
+import se.kumliens.ringring.model.Tenant;
+import se.kumliens.ringring.model.User;
 import se.kumliens.ringring.security.UserSession;
 
-import java.util.ArrayList;
-import java.util.List;
-
+@Slf4j
 public class RegistrationWizard extends VerticalLayout {
 
-    private final List<Component> steps = new ArrayList<>();
-    private int currentStepIndex = 0;
+    Accordion accordion = new Accordion();
 
-    public RegistrationWizard(UserSession userSession) {
-        // Initialize steps
-        if(userSession.tenant == null) {
-            steps.add(createTenantInfoStep(userSession));
-        }
-        steps.add(createUserInfoStep());
-        steps.add(createConfirmationStep());
+    //ctor
+    public RegistrationWizard(UserSession userSession, SecretClient secretClient) {
+        var tenantBinder = new Binder<>(Tenant.class);
+        var userBinder = new Binder<>(User.class);
 
-        // Show the first step
-        showStep(currentStepIndex);
-    }
-
-    private Component createTenantInfoStep(UserSession userSession) {
         var orgName = userSession.getUser().domain().substring(0, userSession.getUser().domain().indexOf("."));
-        var header = new H1("Registrering av  '" + orgName +"'");
-        var text = new Span("Hej " + userSession.getUser().firstName()  +
-                ". Du är den första från " + orgName + " som hittat hit. " +
-                "Börja med att ange lite info om " + orgName + ".");
+        H1 header = new H1("Registrering");
+        Span text = new Span();
+        var summaryPanel = createSummaryPanel(tenantBinder, userBinder);
+        var userInfoPanel = createUserInfoPanel(userSession, userBinder, summaryPanel);
+        if(userSession.tenant == null) {
+            text = new Span("Hej " + userSession.getUser().firstName()  +
+                    ". Du är den första från '" + orgName + "' som hittat hit! \n" +
+                    "Ange lite info om din organisation '" + orgName + "' och om dig.");
+            accordion.add(createTenantInfoPanel(userSession, tenantBinder, userInfoPanel));
+        }
+        accordion.add(userInfoPanel);
+        accordion.add(summaryPanel);
 
-        var form = getOrganisationRegistrationForm(userSession);
-        var layout = new VerticalLayout(header, text, form);
-
-        return layout;
+        add(new VerticalLayout(header, text, accordion));
     }
 
-    private FormLayout getOrganisationRegistrationForm(UserSession userSession) {
+    private AccordionPanel createTenantInfoPanel(UserSession userSession, Binder<Tenant> tenantBinder, AccordionPanel nextPanel) {
         var form = new FormLayout();
-
-        var name = new TextField("Organisationens namn");
+        var name = new TextField("Namn");
         name.setValue(userSession.getUser().domain().substring(0, userSession.getUser().domain().indexOf(".")));
+        tenantBinder.forField(name).asRequired("Ett namn behövs nog").bind(Tenant::name, Tenant::name);
 
-        var domain = new TextField("Organisationens domän (ej ändringsbart)");
+        var domain = new TextField("Domän (ej ändringsbart)");
         domain.setValue(userSession.getUser().domain());
         domain.setReadOnly(true);
+        tenantBinder.forField(domain).bind(Tenant::domain, Tenant::domain);
 
         var elks_id = new TextField("46-Elks client id");
+        tenantBinder.forField(elks_id).bind(Tenant::elkId, Tenant::elkId);
+
         var elks_secret = new PasswordField("46-Elks client secret");
         elks_secret.setTooltipText("Alla hemlisar sparas i Azure Key Cloak");
+        tenantBinder.forField(elks_secret).bind(Tenant::elkSecret, Tenant::elkSecret);
 
         // Add navigation buttons
-        var nextButton = new Button("Nästa", event -> navigateToStep(1));
+        var nextButton = new Button("Nästa", event -> {
+            nextPanel.setOpened(true);
+        });
         nextButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        var cancelButton = new Button("Avbryt", event -> userSession.logout());
 
-        form.add(name, domain, elks_id, elks_secret, new HorizontalLayout(nextButton, cancelButton));
-        return form;
+        form.add(name, domain, elks_id, elks_secret, new HorizontalLayout(nextButton));
+        return new AccordionPanel("Organisation", form);
     }
 
-    private Div createUserInfoStep() {
-        Div stepContent = new Div();
-        stepContent.setText("Step 2: Enter User Information");
 
+    private AccordionPanel createUserInfoPanel(UserSession userSession, Binder<User> binder, AccordionPanel nextPanel) {
+        var form = new FormLayout();
+
+        var firstName = new TextField("Förnamn");
+        binder.forField(firstName).bind(User::firstName, User::firstName);
+        // Add navigation buttons
+        var nextButton = new Button("Nästa", event -> {
+            nextPanel.setOpened(true);
+        });
+        nextButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        form.add(firstName, new HorizontalLayout(nextButton));
+        return new AccordionPanel("Användare", form);
+    }
+
+    private AccordionPanel createSummaryPanel(Binder<Tenant> tenantBinder, Binder<User> userBinder) {
+        var form = new FormLayout();
+        var ok_btn = new Button("Go!", e -> {
+            var tenant = new Tenant();
+            if (tenantBinder.writeBeanIfValid(tenant)) {
+                Notification.show("Tenant är ok...");
+            } else {
+                Notification.show("Valideringsfel...");
+            }
+        });
         // Add form fields for user info
         // Example: TextField firstName = new TextField("First Name");
-
-        // Add navigation buttons
-        Button backButton = new Button("Back", event -> navigateToStep(0));
-        Button nextButton = new Button("Next", event -> navigateToStep(2));
-        stepContent.add(backButton, nextButton);
-
-        return stepContent;
-    }
-
-    private Div createConfirmationStep() {
-        Div stepContent = new Div();
-        stepContent.setText("Step 3: Confirm and Submit");
-
-        // Add a "Submit" button to complete the wizard
-        Button backButton = new Button("Back", event -> navigateToStep(1));
-        Button submitButton = new Button("Submit", event -> {
-            // Handle submission logic here
-            System.out.println("Wizard completed!");
-        });
-        stepContent.add(backButton, submitButton);
-
-        return stepContent;
-    }
-
-    private void showStep(int stepIndex) {
-        removeAll(); // Clear the layout
-        add(steps.get(stepIndex)); // Add the current step
-    }
-
-    private void navigateToStep(int stepIndex) {
-        if (stepIndex >= 0 && stepIndex < steps.size()) {
-            currentStepIndex = stepIndex;
-            showStep(currentStepIndex);
-        }
+        return new AccordionPanel("Sammanfattning", new VerticalLayout(form, new HorizontalLayout(ok_btn)));
     }
 }
