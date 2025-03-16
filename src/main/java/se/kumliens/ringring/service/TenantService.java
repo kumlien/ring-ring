@@ -8,6 +8,7 @@ import se.kumliens.ringring.repo.TenantRepo;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -17,6 +18,12 @@ public class TenantService {
     private final TenantRepo tenantRepository;
 
     public Tenant upsert(Tenant tenant) {
+        if(tenant.getId() != null) {
+            log.info("Updating tenant with id {}: {}", tenant.getId(), tenant);
+        } else {
+            tenant.setId(UUID.randomUUID().toString());
+            log.info("Creating new tenant: {}", tenant);
+        }
         return tenantRepository.save(tenant);
     }
 

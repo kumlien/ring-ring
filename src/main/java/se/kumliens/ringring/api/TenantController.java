@@ -24,7 +24,7 @@ public class TenantController {
         var location = ServletUriComponentsBuilder
                 .fromCurrentRequest() // Get the current request URI (e.g., /api/tenants)
                 .path("/{id}") // Append the tenant ID to the URI
-                .buildAndExpand(createdTenant.id()) // Replace {id} with the actual tenant ID
+                .buildAndExpand(createdTenant.getId()) // Replace {id} with the actual tenant ID
                 .toUri(); // Convert to URI
 
         return ResponseEntity.created(location).body(createdTenant);

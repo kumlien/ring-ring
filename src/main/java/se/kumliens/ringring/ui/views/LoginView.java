@@ -20,11 +20,14 @@ public class LoginView extends Div {
     // URL that Spring uses to connect to Google services
     private static final String OAUTH_URL = "/oauth2/authorization/google";
 
+    /**
+     * Create a login-with-google view. The user get redirected here by the {@link se.kumliens.ringring.security.SecurityConfig}
+     */
     public LoginView() {
         addClassName("login-view");
 
         // Title
-        H1 title = new H1("Logga in till Ring Ring");
+        H1 title = new H1("Välkommen till Ring Ring");
         title.addClassName("login-title");
 
         // Login Button

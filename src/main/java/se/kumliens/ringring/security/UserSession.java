@@ -2,7 +2,7 @@ package se.kumliens.ringring.security;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinServletRequest;
-import lombok.Setter;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +18,7 @@ import java.io.Serializable;
 @Component
 @SessionScope
 @Slf4j
+@Data
 public class UserSession implements Serializable {
 
     private static final String LOGOUT_SUCCESS_URL = "/";
@@ -26,12 +27,10 @@ public class UserSession implements Serializable {
     public boolean domainIsBlocked;
 
     private OAuth2User oAuth2User;
-    @Setter
-    public User user;
-    @Setter
-    public Tenant tenant;
+    private User user;
+    private Tenant tenant;
 
-    public OAuth2User getUser() {
+    public OAuth2User getOAuthUser() {
         if (oAuth2User == null) {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             OAuth2AuthenticatedPrincipal principal = (OAuth2AuthenticatedPrincipal) authentication.getPrincipal();
@@ -54,5 +53,15 @@ public class UserSession implements Serializable {
         logoutHandler.logout(
                 VaadinServletRequest.getCurrent().getHttpServletRequest(), null, null);
 
+    }
+
+    public void setTenant(Tenant tenant) {
+        log.info("Setting tenant in session to {}", tenant);
+        this.tenant = tenant;
+    }
+
+    public void setUser(User user) {
+        log.info("Setting user in session to {}", user);
+        this.user = user;
     }
 }

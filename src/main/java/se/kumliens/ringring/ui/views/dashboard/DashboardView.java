@@ -20,7 +20,7 @@ public class DashboardView extends Div {
         addClassName("dashboard-view"); // Add a CSS class to the root container
 
         // Title
-        H1 title = new H1("Välkommen " + userSession.getUser().firstName() + " till Ring-Ring!");
+        H1 title = new H1("Välkommen " + userSession.getOAuthUser().firstName() + " till Ring-Ring!");
         title.addClassName("dashboard-title");
 
         // Description

@@ -14,6 +14,6 @@ public class CosmosConfiguration {
 
     @Bean
     public AuditorAware<String> auditorProvider(UserSession userSession) {
-        return () -> Optional.ofNullable(userSession != null ? userSession.getUser().email() : "n/as");
+        return () -> Optional.ofNullable(userSession != null ? userSession.getOAuthUser().email() : "n/as");
     }
 }

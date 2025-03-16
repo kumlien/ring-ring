@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 
@@ -12,14 +11,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor // Generates a no-argument constructor
 @AllArgsConstructor // Generates an all-arguments constructor
 @Builder // Generates a builder pattern for the class
-@Accessors(fluent = true) // Generates record-style getters and setters
 public class User {
 
-    private String id;
+    //private String id;
     private String email;
     private String firstName;
     private String lastName;
-    private String role;
-    private String status;
+    private Role role;
     private LocalDateTime createdAt;
 }

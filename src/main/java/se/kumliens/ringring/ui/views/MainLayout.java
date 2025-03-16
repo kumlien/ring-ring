@@ -29,13 +29,13 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
 
     public MainLayout(UserSession userSession) {
         this.userSession = userSession;
-
+        log.info("Usersession: {}", userSession.hashCode());
         addToNavbar(header(userSession));
         addToDrawer(getSideNav());
     }
 
     private Component createAvatar(UserSession userSession) {
-        var user = userSession.getUser();
+        var user = userSession.getOAuthUser();
         var avatar = new Avatar(user.firstName(), user.picture());
 
         var menuBar = new MenuBar();
@@ -82,10 +82,12 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
     public void beforeEnter(BeforeEnterEvent event) {
         // Check if the user has completed registration
         if(userSession.domainIsBlocked) {
-            log.info("Darn, domain for {} is blocked", userSession.user.email());
-        } else if (userSession.tenant == null) {
+            log.info("Darn, domain for {} is blocked", userSession.getUser().getEmail());
+        } else if (userSession.getTenant() == null) {
+            log.info("No tenant in session, redirect to register-tenant");
             event.forwardTo("register-tenant");
         } else if(!userSession.isLoggedIn()) {
+            log.info("No logged in user found in session, redirect to register-user");
             event.forwardTo("register-user");
         }
     }

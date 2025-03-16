@@ -31,7 +31,8 @@ public class CustomAuthSuccessHandler implements AuthenticationSuccessHandler {
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        String domain = userSession.getUser().domain();
+        String domain = userSession.getOAuthUser().domain();
+        log.info("Start login for user {}", userSession.getOAuthUser().email());
 
         if (isBlockedDomain(domain)) {
             //response.sendRedirect("/blocked-domain");
@@ -41,16 +42,22 @@ public class CustomAuthSuccessHandler implements AuthenticationSuccessHandler {
 
         Optional<Tenant> tenant = tenantService.getTenantByDomain(domain);
         if (tenant.isEmpty()) {
+            log.info("No tenant found for domain {}, redirecting to register-tenant", domain);
             response.sendRedirect("/register-tenant");
         } else {
-            var user = tenant.get().users().stream()
-                    .filter(u -> u.email().equals(userSession.getUser().email()))
+            log.info("Tenant found for domain {}", domain);
+            userSession.setTenant(tenant.get());
+            var user = tenant.get().getUsers().stream()
+                    .filter(u -> u.getEmail().equals(userSession.getOAuthUser().email()))
                     .findFirst();
 
             if (user.isEmpty()) {
+                log.info("No registered user found with email {} in tenant {}", userSession.getOAuthUser().email(), tenant.get().getName());
                 response.sendRedirect("/register-user");
             } else {
-                response.sendRedirect("/dashboard");
+                log.info("Tenant and user found, send to root");
+                userSession.setUser(user.get());
+                response.sendRedirect("/");
             }
         }
     }
