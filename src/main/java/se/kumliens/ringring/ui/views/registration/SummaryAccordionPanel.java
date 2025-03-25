@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 public class SummaryAccordionPanel extends AccordionPanel {
 
     public SummaryAccordionPanel (Binder<Tenant> tenantBinder, Binder<User> userBinder, TenantService tenantService, UserSession userSession, SecretClient secretClient) {
+        super();
         setSummaryText("Sammanfattning");
         var textLayout = createTextLayout(tenantBinder, userBinder);
 
@@ -67,7 +68,7 @@ public class SummaryAccordionPanel extends AccordionPanel {
         var textLayout = new VerticalLayout();
         var header = new H3("Sammanfattning");
         if(!isValid(tenantBinder, userBinder)) {
-            textLayout.add(new H3("Något saknas i formulären, gå igenom uppgifterna igen."));
+            textLayout.add(new H3("Något är på tok i formuläret, gå igenom uppgifterna igen."));
             return textLayout;
         }
         textLayout.add(header);

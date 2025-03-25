@@ -1,11 +1,16 @@
 package se.kumliens.ringring.service.elks;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import se.kumliens.ringring.model.VirtualNumber;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -14,6 +19,7 @@ import java.util.Map;
 public class ElksService {
 
     private final RestClient elksClient;
+    private final ObjectMapper objectMapper;
 
     public Map<String, String> getAccount(String clientId, String clientSecret) {
         return elksClient.get()
@@ -25,4 +31,17 @@ public class ElksService {
                 .getBody();
     }
 
+    public List<VirtualNumber> getVirtualNumbers(String clientId, String clientSecret) {
+        var response = elksClient.get()
+                .uri("/numbers")
+                .headers(h -> h.setBasicAuth(clientId, clientSecret))
+                .retrieve()
+                .toEntity(new ParameterizedTypeReference<JsonNode>() {
+                })
+                .getBody();
+        var dataNode = response.get("data"); // Extract the `data` node
+
+        var numbers = objectMapper.convertValue(dataNode, new TypeReference<List<VirtualNumber>>(){});
+        return numbers;
+    }
 }

@@ -13,10 +13,10 @@ import java.time.LocalDateTime;
 @Builder // Generates a builder pattern for the class
 public class User {
 
-    //private String id;
     private String email;
     private String firstName;
     private String lastName;
+    private String phoneNumber;
     private Role role;
     private LocalDateTime createdAt;
 }

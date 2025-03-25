@@ -5,6 +5,7 @@ import com.azure.spring.data.cosmos.core.mapping.PartitionKey;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.*;
 import org.springframework.data.domain.Persistable;
 
@@ -16,6 +17,7 @@ import java.util.List;
 @Data // Generates getters, setters, equals, hashCode, and toString
 @NoArgsConstructor // Generates a no-argument constructor
 @AllArgsConstructor // Generates an all-arguments constructor
+@Slf4j
 public class Tenant implements Persistable<String> {
 
     @Id
@@ -54,5 +56,13 @@ public class Tenant implements Persistable<String> {
     @Override
     public boolean isNew() {
         return created == null;
+    }
+
+    public void addOffice(Office office) {
+        offices.stream().filter(o -> o.name.equalsIgnoreCase(office.name))
+                .findFirst()
+                .ifPresentOrElse(
+                        o -> log.info("Won't add office with name {} since it allready exist", office.name),
+                        () -> offices.add(office));
     }
 }

@@ -1,10 +1,8 @@
 package se.kumliens.ringring.model;
 
-import java.time.LocalDateTime;
+import lombok.Data;
 
-public record Office(
-        String id,
-        String name,
-        String address,
-        LocalDateTime createdAt
-) {}
+@Data
+public class Office {
+    String name, address;
+}
