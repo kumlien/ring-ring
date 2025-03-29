@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class ElksService {
                 .getBody();
     }
 
+    @SneakyThrows
     public List<VirtualNumber> getVirtualNumbers(String clientId, String clientSecret) {
         var response = elksClient.get()
                 .uri("/numbers")
@@ -39,9 +41,11 @@ public class ElksService {
                 .toEntity(new ParameterizedTypeReference<JsonNode>() {
                 })
                 .getBody();
-        var dataNode = response.get("data"); // Extract the `data` node
-
-        var numbers = objectMapper.convertValue(dataNode, new TypeReference<List<VirtualNumber>>(){});
-        return numbers;
+        // Extract the "data" field from the response
+        JsonNode dataNode = response.get("data");
+        if (dataNode == null || !dataNode.isArray()) {
+            throw new IllegalArgumentException("Expected 'data' field to be an array in the response JSON.");
+        }
+        return objectMapper.convertValue(dataNode, new TypeReference<List<VirtualNumber>>(){});
     }
 }

@@ -11,10 +11,13 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import org.apache.logging.log4j.util.Strings;
 import se.kumliens.ringring.model.Office;
 import se.kumliens.ringring.model.Tenant;
 import se.kumliens.ringring.model.VirtualNumber;
 import se.kumliens.ringring.service.elks.ElksService;
+
+import java.util.List;
 
 public class OfficesAccordionPanel extends AccordionPanel {
 
@@ -32,16 +35,31 @@ public class OfficesAccordionPanel extends AccordionPanel {
         binder.forField(address).asRequired("Ge kontoret någon slags adress").bind(Office::getAddress, Office::setAddress);
 
         var virtualNumber = new Select<VirtualNumber>();
-
+        virtualNumber.setLabel("Virtuellt nummer");
+        virtualNumber.setItemLabelGenerator(VirtualNumber::name);
+        binder.forField(virtualNumber).bind(Office::getVirtualNumber, Office::setVirtualNumber);
+        addOpenedChangeListener(evt -> {
+            if(evt.isOpened() && Strings.isNotBlank(tenant.getElkId()) && Strings.isNotBlank(tenant.getElkSecret())) {
+                var numbers = elksService.getVirtualNumbers(tenant.getElkId(), tenant.getElkSecret());
+                if(!numbers.isEmpty()) {
+                    virtualNumber.setItems(elksService.getVirtualNumbers(tenant.getElkId(), tenant.getElkSecret()));
+                    virtualNumber.setValue(numbers.getFirst());
+                }
+            }
+        });
 
         var saveButton = new Button("Spara", event -> {
-            var numbers = elksService.getVirtualNumbers(tenant.getElkId(), tenant.getElkSecret());
+            List<VirtualNumber> numbers = null;
+            numbers = elksService.getVirtualNumbers(tenant.getElkId(), tenant.getElkSecret());
+            if ( numbers != null &&  !numbers.isEmpty()) {
+                Notification.show(numbers.getFirst().toString() );
+            }
             if(binder.isValid()) {
                 tenant.addOffice(binder.getBean());
                 Notification.show("Kontor tillagt", 2_000, Notification.Position.BOTTOM_CENTER);
             }
         });
-
+        saveButton.setEnabled(false);
 
         // Add navigation buttons
         var nextButton = new Button("Nästa", event -> {
@@ -54,7 +72,7 @@ public class OfficesAccordionPanel extends AccordionPanel {
             saveButton.setEnabled(binder.isValid());
         });
 
-        form.add(name, address);
+        form.add(name, address, virtualNumber);
         add( new VerticalLayout(new Span("Ange info för ditt kontor"), form, new HorizontalLayout(saveButton, nextButton)));
     }
 }

@@ -1,11 +1,22 @@
 package se.kumliens.ringring.model;
 
-import java.time.LocalDateTime;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import se.kumliens.ringring.service.elks.VirtualNumberDeserializer;
 
+import java.util.List;
+import java.util.Map;
+
+@JsonDeserialize(using = VirtualNumberDeserializer.class)
 public record VirtualNumber(
         String id,
         String number,
-        String officeId,
         String status,
-        LocalDateTime createdAt
-) {}
+        String name,
+        String category,
+        String allocated,
+        Integer cost,
+        String voice_start,
+        Map<String, List<String>> voiceStart
+) {
+
+}
