@@ -17,16 +17,31 @@ import se.kumliens.ringring.model.Tenant;
 import se.kumliens.ringring.model.VirtualNumber;
 import se.kumliens.ringring.service.elks.ElksService;
 
-import java.util.List;
+import java.util.Collections;
 
 public class OfficesAccordionPanel extends AccordionPanel {
 
+    private final ElksService elksService;
+    private final Tenant tenant;
+    private final AccordionPanel nextPanel;
+
+
     public OfficesAccordionPanel(Tenant tenant, AccordionPanel nextPanel, ElksService elksService) {
-        super();
-        setSummaryText("Kontor");
+        super("Kontor");
+        this.elksService = elksService;
+        this.tenant = tenant;
+        this.nextPanel = nextPanel;
+        addOpenedChangeListener(this::initUi);
+    }
+
+    private void initUi(OpenedChangeEvent evt) {
+        removeAll();
+        if(!evt.isOpened()) return;
+
+        var form = new FormLayout();
+
         var binder = new Binder<>(Office.class);
         binder.setBean(new Office());
-        var form = new FormLayout();
 
         var name = new TextField("Namn");
         binder.forField(name).asRequired("Kontoret behöver ett namn").bind(Office::getName, Office::setName);
@@ -34,45 +49,43 @@ public class OfficesAccordionPanel extends AccordionPanel {
         var address = new TextField("Adress");
         binder.forField(address).asRequired("Ge kontoret någon slags adress").bind(Office::getAddress, Office::setAddress);
 
-        var virtualNumber = new Select<VirtualNumber>();
+        Select<VirtualNumber> virtualNumber = new Select<>();
         virtualNumber.setLabel("Virtuellt nummer");
-        virtualNumber.setItemLabelGenerator(VirtualNumber::name);
+        virtualNumber.setItems(Collections.emptyList());
+        virtualNumber.setItemLabelGenerator(vr -> vr == null ? "<Inget virtuellt nummer kopplat>" : vr.name());
+        virtualNumber.setEmptySelectionAllowed(true);
         binder.forField(virtualNumber).bind(Office::getVirtualNumber, Office::setVirtualNumber);
-        addOpenedChangeListener(evt -> {
-            if(evt.isOpened() && Strings.isNotBlank(tenant.getElkId()) && Strings.isNotBlank(tenant.getElkSecret())) {
+
+        if(Strings.isNotBlank(tenant.getElkId()) && Strings.isNotBlank(tenant.getElkSecret())) {
+            try {
                 var numbers = elksService.getVirtualNumbers(tenant.getElkId(), tenant.getElkSecret());
-                if(!numbers.isEmpty()) {
+                if (!numbers.isEmpty()) {
                     virtualNumber.setItems(elksService.getVirtualNumbers(tenant.getElkId(), tenant.getElkSecret()));
                     virtualNumber.setValue(numbers.getFirst());
                 }
+            } catch (Exception e) {
+                Notification.show("Kunde inte hämta virtuella nummer från 46Elks: " + e.getMessage(), 5000, Notification.Position.MIDDLE);
             }
-        });
+        }
 
-        var saveButton = new Button("Spara", event -> {
-            List<VirtualNumber> numbers = null;
-            numbers = elksService.getVirtualNumbers(tenant.getElkId(), tenant.getElkSecret());
-            if ( numbers != null &&  !numbers.isEmpty()) {
-                Notification.show(numbers.getFirst().toString() );
-            }
+        var saveButton = new Button("Lägg till", event -> {
             if(binder.isValid()) {
                 tenant.addOffice(binder.getBean());
-                Notification.show("Kontor tillagt", 2_000, Notification.Position.BOTTOM_CENTER);
+                Notification.show("Kontor tillagt", 2_500, Notification.Position.MIDDLE);
             }
         });
         saveButton.setEnabled(false);
 
         // Add navigation buttons
-        var nextButton = new Button("Nästa", event -> {
-            nextPanel.setOpened(true);
-        });
+        var nextButton = new Button("Nästa", event -> nextPanel.setOpened(true));
         nextButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         nextButton.setEnabled(false);
-        binder.addStatusChangeListener(evt -> {
+        binder.addStatusChangeListener(statusChangeEvent -> {
             nextButton.setEnabled(binder.isValid());
             saveButton.setEnabled(binder.isValid());
         });
 
         form.add(name, address, virtualNumber);
-        add( new VerticalLayout(new Span("Ange info för ditt kontor"), form, new HorizontalLayout(saveButton, nextButton)));
+        add(new VerticalLayout(new Span("Ange info för ditt kontor"), form, new HorizontalLayout(saveButton, nextButton)));
     }
 }
