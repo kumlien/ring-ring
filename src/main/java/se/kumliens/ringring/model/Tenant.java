@@ -32,7 +32,6 @@ public class Tenant implements Persistable<String> {
     private SubscriptionPlan subscriptionPlan;
     private List<User> users = new ArrayList<>(); // Embedded list of users
     private List<Office> offices = new ArrayList<>(); // Embedded list of offices
-    private List<VirtualNumber> virtualNumbers = new ArrayList<>(); // Embedded list of virtual numbers
 
     @CreatedBy
     private String createdBy;
