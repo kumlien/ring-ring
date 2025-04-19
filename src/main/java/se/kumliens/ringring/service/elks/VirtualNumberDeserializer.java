@@ -1,7 +1,6 @@
 package se.kumliens.ringring.service.elks;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
@@ -21,7 +20,7 @@ public class VirtualNumberDeserializer extends StdDeserializer<VirtualNumber> {
     }
 
     @Override
-    public VirtualNumber deserialize(JsonParser jsonParser, DeserializationContext context) throws IOException, JsonProcessingException {
+    public VirtualNumber deserialize(JsonParser jsonParser, DeserializationContext context) throws IOException {
         JsonNode dataNode = jsonParser.getCodec().readTree(jsonParser);
         //JsonNode dataNode = rootNode.get("data").get(0); // Assuming the JSON contains an array with one object.
 

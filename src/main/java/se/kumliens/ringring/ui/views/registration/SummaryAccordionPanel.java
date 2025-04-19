@@ -12,12 +12,14 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.Binder;
 import lombok.extern.slf4j.Slf4j;
+import se.kumliens.ringring.model.Office;
 import se.kumliens.ringring.model.Tenant;
 import se.kumliens.ringring.model.User;
 import se.kumliens.ringring.security.UserSession;
 import se.kumliens.ringring.service.TenantService;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 /**
  * Panel with a summary of what to register (tenant, user)
@@ -56,7 +58,8 @@ public class SummaryAccordionPanel extends AccordionPanel {
         });
     }
 
-    public static String sanitizeSecretName(String name) {
+    //Used to sanitize names of secrets in Azure Key Vault
+    static String sanitizeSecretName(String name) {
         return name.replaceAll("[^a-zA-Z0-9-]", "-");
     }
 
@@ -67,22 +70,29 @@ public class SummaryAccordionPanel extends AccordionPanel {
     private static VerticalLayout createTextLayout(Binder<Tenant> tenantBinder, Binder<User> userBinder) {
         var textLayout = new VerticalLayout();
         var header = new H3("Sammanfattning");
+        textLayout.add(header);
         if(!isValid(tenantBinder, userBinder)) {
             textLayout.add(new H3("Något är på tok i formuläret, gå igenom uppgifterna igen."));
             return textLayout;
         }
-        textLayout.add(header);
 
         var userDiv = new Div("Ny användare");
         var userDivText = "En ny användare skapas, nämligen du " + userBinder.getBean().getFirstName() + ".";
         if(tenantBinder != null) {
-            var orgDiv = new Div();
+            var tenant = tenantBinder.getBean();
+            var orgName = tenant.getName();
+            var domain = tenant.getDomain();
+            var orgDiv = new Div("En ny organisation '" + orgName + "' med domänen  '" + domain + "' skapas.");
             orgDiv.setTitle("Ny organisation");
-            var orgName = tenantBinder.getBean().getName();
-            var domain = tenantBinder.getBean().getDomain();
-            orgDiv.setText("En ny organisation '" + orgName + "' med domänen  '" + domain + "' skapas.");
             textLayout.add(orgDiv);
-            userDivText += " Eftersom du är den som registrerar din organisation blir du automatiskt administratör för '" + tenantBinder.getBean().getName() + "'";
+            userDivText += " Eftersom du är den som registrerar din organisation blir du automatiskt administratör.";
+
+            if(tenant.hasOffice()) {
+                var officeNames = tenant.getOffices().stream().map(Office::getName).collect(Collectors.joining(","));
+                var officesDiv = new Div(tenant.getOffices().size() + " kontor kommer att registreras (" + officeNames + ").");
+                officesDiv.setTitle("Nytt kontor");
+                textLayout.add(officesDiv);
+            }
         }
         userDiv.setText(userDivText);
         textLayout.add(userDiv);

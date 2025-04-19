@@ -10,7 +10,7 @@ import java.util.Map;
 public record VirtualNumber(
         String id,
         String number,
-        String status,
+        String active,
         String name,
         String category,
         String allocated,

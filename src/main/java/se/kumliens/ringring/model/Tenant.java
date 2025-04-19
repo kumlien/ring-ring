@@ -65,4 +65,8 @@ public class Tenant implements Persistable<String> {
                         o -> log.info("Won't add office with name {} since it allready exist", office.name),
                         () -> offices.add(office));
     }
+
+    public boolean hasOffice() {
+        return offices != null && !offices.isEmpty();
+    }
 }

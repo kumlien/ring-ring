@@ -28,6 +28,7 @@ public class UserAccordionPanel extends AccordionPanel {
 
         var phoneNumber = new TextField("Ditt telefonnummer");
         phoneNumber.setPattern("^\\+[1-9]\\d{1,14}$");
+        phoneNumber.setPlaceholder("Internationellt format, t.ex. +46720786543");
         binder.forField(phoneNumber).asRequired("Du måste ange ditt telefonnummer").bind(User::getPhoneNumber, User::setPhoneNumber);
 
         var role = new Select<Role>();
@@ -40,6 +41,8 @@ public class UserAccordionPanel extends AccordionPanel {
         // Add navigation buttons
         var nextButton = new Button("Nästa", event -> nextPanel.setOpened(true));
         nextButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        nextButton.setEnabled(false);
+        binder.addStatusChangeListener(statusChangeEvent -> nextButton.setEnabled(binder.isValid()));
 
         form.add(firstName, lastName, phoneNumber, role);
         add( new VerticalLayout(form, nextButton));

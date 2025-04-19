@@ -41,7 +41,7 @@ public class OfficesAccordionPanel extends AccordionPanel {
         var form = new FormLayout();
 
         var binder = new Binder<>(Office.class);
-        binder.setBean(new Office());
+        binder.setBean(tenant.getOffices().isEmpty() ? new Office() : tenant.getOffices().getFirst());
 
         var name = new TextField("Namn");
         binder.forField(name).asRequired("Kontoret behöver ett namn").bind(Office::getName, Office::setName);
@@ -70,15 +70,18 @@ public class OfficesAccordionPanel extends AccordionPanel {
 
         var saveButton = new Button("Lägg till", event -> {
             if(binder.isValid()) {
-                tenant.addOffice(binder.getBean());
-                Notification.show("Kontor tillagt", 2_500, Notification.Position.MIDDLE);
+                if(!tenant.getOffices().contains(binder.getBean())) {
+                    tenant.addOffice(binder.getBean());
+                    Notification.show(binder.getBean().getName() + " tillagt", 2_500, Notification.Position.MIDDLE);
+                }
             }
         });
         saveButton.setEnabled(false);
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
 
         // Add navigation buttons
         var nextButton = new Button("Nästa", event -> nextPanel.setOpened(true));
-        nextButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         nextButton.setEnabled(false);
         binder.addStatusChangeListener(statusChangeEvent -> {
             nextButton.setEnabled(binder.isValid());
