@@ -34,6 +34,7 @@ public class ElksService {
 
     @SneakyThrows
     public List<VirtualNumber> getVirtualNumbers(String clientId, String clientSecret) {
+        log.info("Fetching virtual numbers for client {}", clientId);
         var response = elksClient.get()
                 .uri("/numbers")
                 .headers(h -> h.setBasicAuth(clientId, clientSecret))
@@ -42,10 +43,11 @@ public class ElksService {
                 })
                 .getBody();
         // Extract the "data" field from the response
-        JsonNode dataNode = response.get("data");
+        log.info("Got response: {}", response);
+        JsonNode dataNode = response != null ? response.get("data") : null;
         if (dataNode == null || !dataNode.isArray()) {
             throw new IllegalArgumentException("Expected 'data' field to be an array in the response JSON.");
         }
-        return objectMapper.convertValue(dataNode, new TypeReference<List<VirtualNumber>>(){});
+        return objectMapper.convertValue(dataNode, new TypeReference<>() {});
     }
 }

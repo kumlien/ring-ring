@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import se.kumliens.ringring.security.UserSession;
 import se.kumliens.ringring.ui.components.NavigationLink;
 import se.kumliens.ringring.ui.views.dashboard.DashboardView;
+import se.kumliens.ringring.ui.views.offices.OfficesView;
 
 @Slf4j
 @CssImport("./styles/main-layout.css") // Import the CSS file
@@ -52,6 +53,10 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
         var nav = new SideNav();
         var dashboardLink = new NavigationLink("Dashboard", DashboardView.class, VaadinIcon.DASHBOARD.create());
         nav.addItem(dashboardLink);
+
+        var officiesLink = new NavigationLink("Kontor", OfficesView.class, VaadinIcon.OFFICE.create());
+        nav.addItem(officiesLink);
+
         var scroller = new Scroller(nav);
         scroller.setClassName(LumoUtility.Padding.SMALL);
         return scroller;
@@ -63,11 +68,15 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
         H1 title = new H1("Ring Ring");
         title.addClassName("header-title");
         title.getStyle().set("font-size", "var(--lumo-font-size-l)").set("margin", "0");
+
+        H1 tenant = new H1("Du hanterar '" + userSession.getTenant().getName() + "'");
+        tenant.addClassName("header-title");
+        tenant.getStyle().set("font-size", "var(--lumo-font-size-l)").set("margin", "0");
         // Create an Avatar component
         var avatar = createAvatar(userSession);
 
         // Layout for the header
-        var header = new HorizontalLayout(toggle, title, avatar);
+        var header = new HorizontalLayout(toggle, title, tenant, avatar);
         header.setAlignItems(FlexComponent.Alignment.CENTER);
         header.setWidthFull();
         header.expand(title);

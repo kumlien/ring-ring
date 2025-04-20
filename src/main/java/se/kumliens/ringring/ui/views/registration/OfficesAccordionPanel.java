@@ -11,7 +11,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
-import org.apache.logging.log4j.util.Strings;
 import se.kumliens.ringring.model.Office;
 import se.kumliens.ringring.model.Tenant;
 import se.kumliens.ringring.model.VirtualNumber;
@@ -56,17 +55,11 @@ public class OfficesAccordionPanel extends AccordionPanel {
         virtualNumber.setEmptySelectionAllowed(true);
         binder.forField(virtualNumber).bind(Office::getVirtualNumber, Office::setVirtualNumber);
 
-        if(Strings.isNotBlank(tenant.getElkId()) && Strings.isNotBlank(tenant.getElkSecret())) {
-            try {
-                var numbers = elksService.getVirtualNumbers(tenant.getElkId(), tenant.getElkSecret());
-                if (!numbers.isEmpty()) {
-                    virtualNumber.setItems(elksService.getVirtualNumbers(tenant.getElkId(), tenant.getElkSecret()));
-                    virtualNumber.setValue(numbers.getFirst());
+                if (tenant.hasVirtualNumbers()) {
+                    virtualNumber.setItems(tenant.getVirtualNumbers());
+                    virtualNumber.setValue(tenant.getVirtualNumbers().getFirst());
                 }
-            } catch (Exception e) {
-                Notification.show("Kunde inte hämta virtuella nummer från 46Elks: " + e.getMessage(), 5000, Notification.Position.MIDDLE);
-            }
-        }
+
 
         var saveButton = new Button("Lägg till", event -> {
             if(binder.isValid()) {

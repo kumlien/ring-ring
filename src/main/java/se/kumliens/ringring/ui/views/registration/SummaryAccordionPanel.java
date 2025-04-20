@@ -82,7 +82,7 @@ public class SummaryAccordionPanel extends AccordionPanel {
             var tenant = tenantBinder.getBean();
             var orgName = tenant.getName();
             var domain = tenant.getDomain();
-            var orgDiv = new Div("En ny organisation '" + orgName + "' med domänen  '" + domain + "' skapas.");
+            var orgDiv = new Div("En ny organisation '" + orgName + "' kopplad till domänen '" + domain + "' skapas.");
             orgDiv.setTitle("Ny organisation");
             textLayout.add(orgDiv);
             userDivText += " Eftersom du är den som registrerar din organisation blir du automatiskt administratör.";

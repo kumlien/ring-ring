@@ -50,6 +50,7 @@ public class TenantAccordionPanel extends AccordionPanel {
         // Add a "Validate" button
         var validateButton = new ValidateElksButton(elks_id, elks_secret, elksService, success -> {
             if(success) {
+                tenantBinder.getBean().setVirtualNumbers(elksService.getVirtualNumbers(elks_id.getValue(), elks_secret.getValue()));
                 var n = new Notification("Lyckad koppling till älgarna!", 3_000, Notification.Position.MIDDLE);
                 n.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                 n.open();

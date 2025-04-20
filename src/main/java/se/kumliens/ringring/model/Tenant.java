@@ -32,6 +32,7 @@ public class Tenant implements Persistable<String> {
     private SubscriptionPlan subscriptionPlan;
     private List<User> users = new ArrayList<>(); // Embedded list of users
     private List<Office> offices = new ArrayList<>(); // Embedded list of offices
+    private List<VirtualNumber> virtualNumbers = new ArrayList<>(); //Embedded (mirrored) list of the virtual numbers
 
     @CreatedBy
     private String createdBy;
@@ -67,5 +68,9 @@ public class Tenant implements Persistable<String> {
 
     public boolean hasOffice() {
         return offices != null && !offices.isEmpty();
+    }
+
+    public boolean hasVirtualNumbers() {
+        return virtualNumbers != null && !virtualNumbers.isEmpty();
     }
 }
