@@ -72,27 +72,17 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
         var toggle = new DrawerToggle();
         toggle.getStyle().set("margin", "0").set("padding", "0"); // Remove margin and padding
 
-        H1 tenant = new H1("Du hanterar '" + userSession.getTenant().getName() + "'");
-        tenant.addClassName("header-title");
-        tenant.getStyle().set("font-size", "var(--lumo-font-size-l)").set("margin", "0");
+        H1 tenant = new H1( userSession.getTenant().getDomain());
+        tenant.getStyle().
+                set("font-size", "var(--lumo-font-size-l)")
+                .set("margin", "0")
+                .set("color", "rgba(0, 0, 0, 0.2)"); // Use Vaadin's secondary text color
 
         var logoImg = new Image("images/logo_2.png", "App logo");
         logoImg.setHeight("44px");
-        logoImg.getStyle().set("display", "block");
-        var logo = new Div(logoImg);
-        logo.getStyle()
-                .set("margin", "0")
-                .set("padding", "0")
-                .set("display", "flex") // Make the Div a flex container
-                .set("align-items", "center"); // Center the image vertically within the Div
 
         var layout_1 = new HorizontalLayout(toggle, logoImg);
         layout_1.setSpacing(false); // Remove spacing between components
-        layout_1.setPadding(false); // Remove padding around the layout
-        layout_1.setMargin(false);  // Remove margin around the layout
-        //layout_1.setAlignItems(FlexComponent.Alignment.BASELINE); // Align components vertically
-
-
 
         // Create an Avatar component
         var avatar = createAvatar(userSession);
