@@ -17,7 +17,6 @@ import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
-import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import lombok.extern.slf4j.Slf4j;
 import se.kumliens.ringring.security.UserSession;
@@ -71,20 +70,35 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
     //Create the header part
     private HorizontalLayout header(UserSession userSession) {
         var toggle = new DrawerToggle();
+        toggle.getStyle().set("margin", "0").set("padding", "0"); // Remove margin and padding
 
         H1 tenant = new H1("Du hanterar '" + userSession.getTenant().getName() + "'");
         tenant.addClassName("header-title");
         tenant.getStyle().set("font-size", "var(--lumo-font-size-l)").set("margin", "0");
 
-        var logoImg = new Image("images/logo.png", "App logo");
-        logoImg.setHeight("50px");
+        var logoImg = new Image("images/logo_2.png", "App logo");
+        logoImg.setHeight("44px");
+        logoImg.getStyle().set("display", "block");
         var logo = new Div(logoImg);
+        logo.getStyle()
+                .set("margin", "0")
+                .set("padding", "0")
+                .set("display", "flex") // Make the Div a flex container
+                .set("align-items", "center"); // Center the image vertically within the Div
+
+        var layout_1 = new HorizontalLayout(toggle, logoImg);
+        layout_1.setSpacing(false); // Remove spacing between components
+        layout_1.setPadding(false); // Remove padding around the layout
+        layout_1.setMargin(false);  // Remove margin around the layout
+        //layout_1.setAlignItems(FlexComponent.Alignment.BASELINE); // Align components vertically
+
+
 
         // Create an Avatar component
         var avatar = createAvatar(userSession);
 
         // Layout for the header
-        var header = new HorizontalLayout(toggle, logo, tenant, avatar);
+        var header = new HorizontalLayout(layout_1, tenant, avatar);
         header.setAlignItems(FlexComponent.Alignment.CENTER);
         header.setWidthFull();
         header.expand(tenant);
