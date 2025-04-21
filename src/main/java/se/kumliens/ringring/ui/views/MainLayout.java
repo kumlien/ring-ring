@@ -5,7 +5,9 @@ import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
@@ -15,6 +17,7 @@ import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
+import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import lombok.extern.slf4j.Slf4j;
 import se.kumliens.ringring.security.UserSession;
@@ -38,10 +41,12 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
     private Component createAvatar(UserSession userSession) {
         var user = userSession.getOAuthUser();
         var avatar = new Avatar(user.firstName(), user.picture());
+        var avatarDiv = new Div(avatar);
+        avatarDiv.getStyle().set("padding", "10px");
 
         var menuBar = new MenuBar();
         menuBar.addThemeVariants(MenuBarVariant.LUMO_TERTIARY_INLINE);
-        var menuItem = menuBar.addItem(avatar);
+        var menuItem = menuBar.addItem(avatarDiv);
         var subMenu = menuItem.getSubMenu();
         var signOut = subMenu.addItem("Sign out");
         signOut.addClickListener(evt -> userSession.logout());
@@ -51,35 +56,38 @@ public class MainLayout extends AppLayout implements BeforeEnterObserver {
 
     private Scroller getSideNav() {
         var nav = new SideNav();
+
         var dashboardLink = new NavigationLink("Dashboard", DashboardView.class, VaadinIcon.DASHBOARD.create());
         nav.addItem(dashboardLink);
 
-        var officiesLink = new NavigationLink("Kontor", OfficesView.class, VaadinIcon.OFFICE.create());
-        nav.addItem(officiesLink);
+        var officesLink = new NavigationLink("Kontor", OfficesView.class, VaadinIcon.OFFICE.create());
+        nav.addItem(officesLink);
 
         var scroller = new Scroller(nav);
         scroller.setClassName(LumoUtility.Padding.SMALL);
         return scroller;
     }
 
+    //Create the header part
     private HorizontalLayout header(UserSession userSession) {
         var toggle = new DrawerToggle();
-        // Header
-        H1 title = new H1("Ring Ring");
-        title.addClassName("header-title");
-        title.getStyle().set("font-size", "var(--lumo-font-size-l)").set("margin", "0");
 
         H1 tenant = new H1("Du hanterar '" + userSession.getTenant().getName() + "'");
         tenant.addClassName("header-title");
         tenant.getStyle().set("font-size", "var(--lumo-font-size-l)").set("margin", "0");
+
+        var logoImg = new Image("images/logo.png", "App logo");
+        logoImg.setHeight("50px");
+        var logo = new Div(logoImg);
+
         // Create an Avatar component
         var avatar = createAvatar(userSession);
 
         // Layout for the header
-        var header = new HorizontalLayout(toggle, title, tenant, avatar);
+        var header = new HorizontalLayout(toggle, logo, tenant, avatar);
         header.setAlignItems(FlexComponent.Alignment.CENTER);
         header.setWidthFull();
-        header.expand(title);
+        header.expand(tenant);
         header.addClassName("header");
 
         return header;

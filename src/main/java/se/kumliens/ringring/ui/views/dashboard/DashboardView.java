@@ -34,7 +34,7 @@ public class DashboardView extends VerticalLayout {
     private void initUi(UserSession userSession) {
         removeAll();
         // Title
-        H1 title = new H1("Välkommen " + userSession.getOAuthUser().firstName() + "!");
+        H1 title = new H1("Välkommen " + userSession.getOAuthUser().firstName());
         title.addClassName("dashboard-title");
 
         var cardlayout = new FlexLayout();
@@ -94,8 +94,8 @@ public class DashboardView extends VerticalLayout {
             card.add(layout);
         }
 
-        Button bookVacationButton = new Button("Skapa nytt");
-        Button learnMoreButton = new Button("Visa lista");
+        Button bookVacationButton = new Button("Skapa nytt kontor");
+        Button learnMoreButton = new Button("Visa alla");
         card.addToFooter(bookVacationButton, learnMoreButton);
         return card;
     }
